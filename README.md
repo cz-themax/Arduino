@@ -1,5 +1,5 @@
 #Arduino -  Dálkové ovládání pomocí SMS
-Prikazy:
+Prikazy:\n
 gloz - otevre nebo zavre levou garaz
 gpoz - otevre nebo zavre pravou garaz
 broz - otevre nebo zavre branu
