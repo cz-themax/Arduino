@@ -20,15 +20,15 @@ SMSGSM sms;
 
 boolean started = false;
 boolean potvrzeni = false;
-char position;  
+char position;
 char smsNumber[20];
-char smsText[160];
+char smsMessageChar[160];
 int smsLength;
 int relay1 = 6;
 int relay2 = 5;
 int relay3 = 4;
 
-void setup() 
+void setup()
 {
   Serial.begin(9600);
 
@@ -53,7 +53,7 @@ void setup()
     started=true;  
   }
   else Serial.println("\nstatus=IDLE");
-  
+
   if (started) {
     // smaze vsechny ulozene SMS
     if(gsm.SendATCmdWaitResp("AT+CMGD=1,1", 1000, 50, "OK", 2)) {
@@ -62,21 +62,21 @@ void setup()
   }
 };
 
-void loop() 
+void loop()
 {
   if(started){
     // nacte pozici SMS, pokud je nejaka neprectena
     position = sms.IsSMSPresent(SMS_UNREAD);
     if (position) {
       // read new SMS
-      sms.GetSMS(position, smsNumber, smsText, 160);
+      sms.GetSMS(position, smsNumber, smsMessageChar, 160);
 
-      String smsMessage = smsText;
+      String smsMessage = smsMessageChar;
       smsMessage.trim();
       smsMessage.toLowerCase();
-      
+
       Serial.println(smsMessage);
-      
+
       // Zpracovani prichoziho prikazu
       if (smsMessage == "gloz") {
         re1Zap();
@@ -110,7 +110,7 @@ void loop()
         sms.SendSMS(smsNumber, "ICMP Echo Reply - Pong, ziju!");
       }
       else if (smsMessage.indexOf("konfig") >=0 ) {
-        konfigurace();
+        konfigurace(smsMessageChar);
       }
       else {
         Serial.println("Neznamy prikaz");
@@ -142,5 +142,25 @@ void re3Zap() {
   digitalWrite(relay3, LOW);
 }
 
-void konfigurace() {
+//void konfigurace(String smsMessageLoc) {
+void konfigurace(char *smsMessageCharLoc) {
+
+  Serial.println("Konfigurace:");
+  Serial.println(smsMessageCharLoc);
+  Serial.println();
+
+  char *konfParamLoc;
+  char *konfHodnotaLoc = strtok( smsMessageCharLoc, " " );
+  while( konfHodnotaLoc !=NULL ) {
+    konfParamLoc   = strtok( NULL, " " );
+    konfHodnotaLoc = strtok( NULL, " " );
+    if (konfHodnotaLoc == NULL) break;  // Pokud zustane konfParamLoc bez konfHodnotaLoc, vyskocit z while()
+    Serial.print("Parametr: ");
+    Serial.print(konfParamLoc);
+    Serial.print(" = ");
+    Serial.println(konfHodnotaLoc);
+  }
+
+
+
 }
